@@ -7,11 +7,11 @@ class Communicator:
     def on_login(self, credentials):
         form = {"name": credentials[0], "password": credentials[1]}
         try:
-          response = requests.post("https://127.0.0.1:5000/login", form, verify=False)
+            response = requests.post("https://127.0.0.1:5000/login", form, verify=False)
         except requests.exceptions.ConnectionError:
-          response.status_code = "Connection refused"
+            response.status_code = "Connection refused"
         if(response.status_code != 202):
-            #HANDLE INVALID CREDENTIALS :)
+            # HANDLE INVALID CREDENTIALS :)
             return None
         print(response.json()["token"])
         return response.json()

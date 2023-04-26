@@ -1,10 +1,12 @@
 import customtkinter as ctk
 import communicator
+import json
+from functools import partial
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("dark-blue")
 
-BUTTONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "+", "-", "*", "/", ",", "="]
+SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*", "/", "0", ",", "="]
 
 class CalculatorWindow(ctk.CTkFrame):
     def __init__(self, mainwindow, parent):
@@ -20,17 +22,25 @@ class CalculatorWindow(ctk.CTkFrame):
         buttoncount = 0
         for x in range(4):
             for y in range(4):
-                username_entry = ctk.CTkButton(master=self.__calculatorframe, text=BUTTONS[buttoncount], width=50, height=50)
-                username_entry.grid(row=1+x, column=y)
+                self.create_symbolbutton(SYMBOLS[buttoncount], x, y)
                 buttoncount += 1
 
         self.hide()
     
+    def create_symbolbutton(self, symbol, x, y):
+        symbol_button = ctk.CTkButton(master=self.__calculatorframe, text=symbol,
+                                              width=50, height=50, command = lambda: self.post(symbol))
+        symbol_button.grid(row=1+x, column=y)
+
     def hide(self):
         self.__calculatorframe.grid_forget()
 
     def show(self):
         self.__calculatorframe.grid(row=0, column=0)
+
+    def post(self, symbol):
+        print(symbol)
+        self.__mw.send(symbol)
 
 
 class LoginWindow(ctk.CTkFrame):
@@ -110,6 +120,7 @@ class Calc:
         self.__window = ctk.CTk()
         self.__window.resizable(False,False)
         self.__cm = cm
+        self.__token = None
 
         self.__frames = {"login": LoginWindow(self, self.__window), "registration": RegistrationWindow(self, self.__window), "calculator": CalculatorWindow(self, self.__window)}
         self.__current_frame = self.__frames["login"]
@@ -133,12 +144,19 @@ class Calc:
         self.__current_frame = self.__frames["calculator"]
 
     def log(self, credentials):
-        #if cm.on_login(credentials):
-        self.move_to_calc()
+        print(credentials)
+        login_data = cm.on_login(credentials)
+        if login_data["status"] ==  202:
+            self.__token = login_data["token"]
+            self.move_to_calc()
 
     def reg(self, credentials):
         if cm.on_register(credentials):
             self.move_to_log()
+    
+    def send(self, symbol):
+        cm.on_post(symbol, self.__token)
+        cm.get_status(self.__token)
 
 
 if __name__ == "__main__":
