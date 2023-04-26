@@ -39,3 +39,9 @@ class Communicator:
         response = requests.get("https://127.0.0.1:5000/status", form, verify=False)
         print(response.json())
         return response.json()
+    
+    def equals(self, token):
+        form = {"token": token}
+        response = requests.post("https://127.0.0.1:5000/equals", form, verify=False)
+        print(response.json())
+        return response.json()
