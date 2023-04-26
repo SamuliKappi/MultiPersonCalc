@@ -15,7 +15,10 @@ num2 = "0"
 @app.post("/signup")
 def sign_post():
     name = request.form.get("name")
-    if (not re.match("^[A-Za-z0-9_-]*$", name)):
+    password = request.form.get("password")
+    if(len(password) < 1):
+        return jsonify(message="Invalid password"), 404
+    if (not re.match("^[A-Za-z0-9_-]{1,}$", name)):
         return jsonify(status=404, message="Invalid name"), 404
     
     f = open("users.db", "rb")
