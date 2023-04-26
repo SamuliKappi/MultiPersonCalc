@@ -156,7 +156,7 @@ class Calc:
     
     def send(self, symbol):
         cm.on_post(symbol, self.__token)
-        cm.get_status(self.__token)
+        #cm.get_status(self.__token)
 
 
 if __name__ == "__main__":

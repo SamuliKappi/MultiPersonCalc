@@ -23,7 +23,7 @@ class Communicator:
         return response.json()
 
     def on_post(self, symbol, token):
-        form = {"input": symbol}
+        form = {"input": symbol, "token":token}
         response = requests.post("https://127.0.0.1:5000/addNumber", form, verify=False)
         print(response.json())
         return response.json()
