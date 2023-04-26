@@ -2,4 +2,10 @@ curl -k -X POST https://127.0.0.1:5000/signup -H Content-Type:application/x-www-
 
 curl -k -X POST https://127.0.0.1:5000/login -H Content-Type:application/x-www-form-urlencoded  -d "name=test&password=test"
 
-curl -k -X POST https://127.0.0.1:5000/test -H Content-Type:application/x-www-form-urlencoded  -d "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODAwOTYwNzZ9.btfPg86wprOCLyD9yH9oWvkxBjS7PKFmROww94s4yCE"
+curl -k -X POST https://127.0.0.1:5000/addNumber -H Content-Type:application/x-www-form-urlencoded  -d "input=4&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI1MjE2MDh9.2HB3b2gMiw3vTYdniQBbdVdPITOkKiFYFBBaAVKMNNU"
+
+curl -k -X POST https://127.0.0.1:5000/reset -H Content-Type:application/x-www-form-urlencoded  -d "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI1MjE2MDh9.2HB3b2gMiw3vTYdniQBbdVdPITOkKiFYFBBaAVKMNNU"
+
+curl -k -X POST https://127.0.0.1:5000/equals -H Content-Type:application/x-www-form-urlencoded  -d "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI1MjE2MDh9.2HB3b2gMiw3vTYdniQBbdVdPITOkKiFYFBBaAVKMNNU"
+
+curl -k -X GET https://127.0.0.1:5000/status -H Content-Type:application/x-www-form-urlencoded  -d "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODI1MjI1MjJ9.wSXrFltTyXmGfrRQ4ZuyfCVL0IhZfPw_U9_9fUMlJBQ"
