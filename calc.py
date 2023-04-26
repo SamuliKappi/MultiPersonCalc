@@ -14,11 +14,14 @@ class CalculatorWindow(ctk.CTkFrame):
         self.__calculatorframe = ctk.CTkFrame(master=parent)
         self.__calculatorframe.grid(row=0, column=0)
 
+        self.__equation_label = ctk.CTkLabel(master=self.__calculatorframe, text="")
+        self.__equation_label.grid(row=0, column=0, columnspan=4)
+
         buttoncount = 0
         for x in range(4):
             for y in range(4):
-                username_entry = ctk.CTkButton(master=self.__calculatorframe, text=BUTTONS[buttoncount])
-                username_entry.grid(row=x, column=y)
+                username_entry = ctk.CTkButton(master=self.__calculatorframe, text=BUTTONS[buttoncount], width=50, height=50)
+                username_entry.grid(row=1+x, column=y)
                 buttoncount += 1
 
         self.hide()
@@ -36,6 +39,7 @@ class LoginWindow(ctk.CTkFrame):
         self.__mw = mainwindow
         self.__loginframe = ctk.CTkFrame(master=parent)
         self.__loginframe.grid(row=0, column=0, sticky=ctk.E+ctk.W+ctk.S+ctk.N)
+        self.__loginframe.columnconfigure(index=0, minsize=450)
 
         login_label = ctk.CTkLabel(master=self.__loginframe, text="Login")
         login_label.pack(padx=10, pady=8)
@@ -83,7 +87,7 @@ class RegistrationWindow(ctk.CTkFrame):
         credential_button = ctk.CTkButton(master=self.__registrationframe, text="Register", command=self.reg)
         credential_button.pack(padx=10, pady=8)
 
-        credential_label = ctk.CTkButton(master=self.__registrationframe, text="Already have an account?", command=self.move_to_log)
+        credential_label = ctk.CTkButton(master=self.__registrationframe, text="Have an account?", command=self.move_to_log)
         credential_label.pack(padx=10, pady=8)
 
         self.hide()
@@ -104,7 +108,7 @@ class RegistrationWindow(ctk.CTkFrame):
 class Calc:
     def __init__(self, cm):
         self.__window = ctk.CTk()
-        self.__window.geometry("400x300")
+        self.__window.resizable(False,False)
         self.__cm = cm
 
         self.__frames = {"login": LoginWindow(self, self.__window), "registration": RegistrationWindow(self, self.__window), "calculator": CalculatorWindow(self, self.__window)}
@@ -129,8 +133,8 @@ class Calc:
         self.__current_frame = self.__frames["calculator"]
 
     def log(self, credentials):
-        if cm.on_login(credentials):
-            self.move_to_calc()
+        #if cm.on_login(credentials):
+        self.move_to_calc()
 
     def reg(self, credentials):
         if cm.on_register(credentials):
