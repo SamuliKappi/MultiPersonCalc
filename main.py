@@ -149,31 +149,31 @@ def equals():
         num1 = "0"
         num2 = ""
         operator = ""
-        return jsonify(result=result), 200
+        return jsonify(num1=result, operator="", num2=""), 200
     elif(operator == "*"):
         result = int(num1) * int(num2)
         num1 = "0"
         num2 = ""
         operator = ""
-        return jsonify(result=result), 200
+        return jsonify(num1=result, operator="", num2=""), 200
     elif(operator == "/"):
         result = int(num1) / int(num2)
         num1 = "0"
         num2 = ""
         operator = ""
-        return jsonify(result=result), 200
+        return jsonify(num1=result, operator="", num2=""), 200
     elif(operator == "-"):
         result = int(num1) - int(num2)
         num1 = "0"
         num2 = ""
         operator = ""
-        return jsonify(result=result), 200
+        return jsonify(num1=result, operator="", num2=""), 200
     elif(operator == "^"):
         result = int(num1) ** int(num2)
         num1 = "0"
         num2 = ""
         operator = ""
-        return jsonify(result=result), 200
+        return jsonify(num1=result, operator="", num2=""), 200
     else:
         return jsonify(messsage="Invalid operator"), 400
 def validate_token(token):
