@@ -5,8 +5,6 @@ import jwt
 import datetime
 import secrets
 
-
-
 ph = argon2.PasswordHasher()
 app = Flask(__name__)
 key = None
@@ -94,19 +92,23 @@ def add_number():
         return jsonify(message="Input is invalid"), 400
     
     if(len(userinput) != 1):
-        return jsonify(message="Should not be possible"), 418
+        return jsonify(message="I'm a teapot"), 418
     global operator, num1, num2
-    if(operator == "" and not is_operator(userinput)):
+    if(operator == "" and re.match("[0-9]", userinput)):
         if(num1 == "0"):
             num1 = userinput
-        else:
+        elif(num1 == "-0"):
+            num1 = "-" + userinput
+        elif(len(num1) < 10):
             num1 += str(userinput)
-    elif(operator == "" and is_operator(userinput)):
+    elif(is_operator(userinput)):
         operator = str(userinput)
-    elif(operator != "" and not is_operator(userinput) and re.match("[0-9]", userinput)):
+    elif(operator != "" and re.match("[0-9]", userinput)):
         if(num2 == "0"):
             num2 = userinput
-        else:
+        elif(num2 == "-0"):
+            num2 = "-" + userinput
+        elif(len(num2) < 10):
             num2 += str(userinput)
 
     print("Current state is " + str(num1) + " " + str(operator) + " " + str(num2))
@@ -160,6 +162,7 @@ def swap():
         return jsonify(message="Token is missing"), 401
     if(not validate_token(token)):
         return jsonify(message="Token is invalid"), 401
+    global num1, num2, operator
     if(num2 != ""):
         if(num2[0] == "-"):
           num2 = num2[1:]
@@ -191,33 +194,37 @@ def equals():
     if(not validate_token(token)):
         return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
+    if(num2 == "" and is_operator(operator)):
+        num2 = num1
     if(operator == "+"):
         num1 = str(int(num1) + int(num2))
         num2 = ""
         operator = ""
-        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "*"):
         num1 = str(int(num1) * int(num2))
         num2 = ""
         operator = ""
-        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "/"):
-        num1 = str(int(num1) / int(num2))
+        num1 = str(int(num1) // int(num2))
         num2 = ""
         operator = ""
-        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "-"):
         num1 = str(int(num1) - int(num2))
         num2 = ""
         operator = ""
-        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "^"):
-        num1 = str(int(num1) ** int(num2))
+        if(len(num2) > 2):
+          num1 = "0"
+        else:
+          num1 = str(int(num1) ** int(num2))
         num2 = ""
         operator = ""
-        return jsonify(num1=num1, operator="", num2=""), 200
-    else:
-        return jsonify(messsage="Invalid operator"), 400
+        
+    if (len(num1) > 10):
+        num1 = "0"
+    return jsonify(num1=num1, operator=operator, num2=num2), 200
+
+
 def validate_token(token):
     try:
         jwt.decode(token.encode(), key, algorithms=["HS256"])
