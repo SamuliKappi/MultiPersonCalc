@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import communicator
-import json
 from functools import partial
 
 ctk.set_appearance_mode("System")
@@ -28,18 +27,18 @@ class CalculatorWindow(ctk.CTkFrame):
 
         refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Refresh dingus",
                                         height=60, width=120, command = lambda: self.post("Refresh"))
-        refresh_button.grid(row=6, column=0, columnspan=2)
+        refresh_button.grid(row=5, column=0, columnspan=2)
 
         refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Reset dingus",
                                 height=60, width=120, command = lambda: self.post("Reset"))
-        refresh_button.grid(row=6, column=2, columnspan=2)
+        refresh_button.grid(row=5, column=2, columnspan=2)
 
         self.hide()
     
     def create_symbolbutton(self, symbol, x, y):
         symbol_button = ctk.CTkButton(master=self.__calculatorframe, text=symbol,
                                               width=60, height=60, command = lambda: self.post(symbol))
-        symbol_button.grid(row=2+x, column=y)
+        symbol_button.grid(row=1+x, column=y)
 
     def hide(self):
         self.__calculatorframe.grid_forget()
@@ -56,7 +55,7 @@ class CalculatorWindow(ctk.CTkFrame):
     def post(self, code):
         if code == "Reset":
             response = self.__mw.reset()
-        if code == "Refresh":
+        elif code == "Refresh":
             response = self.__mw.status()
         elif code == "=":
             response = self.__mw.equals()
