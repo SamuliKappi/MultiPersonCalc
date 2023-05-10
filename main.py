@@ -145,27 +145,27 @@ def equals():
         return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
     if(operator == "+"):
-        num1 = int(num1) + int(num2)
+        num1 = str(int(num1) + int(num2))
         num2 = ""
         operator = ""
         return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "*"):
-        num1 = int(num1) * int(num2)
+        num1 = str(int(num1) * int(num2))
         num2 = ""
         operator = ""
         return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "/"):
-        num1 = int(num1) / int(num2)
+        num1 = str(int(num1) / int(num2))
         num2 = ""
         operator = ""
         return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "-"):
-        num1 = int(num1) - int(num2)
+        num1 = str(int(num1) - int(num2))
         num2 = ""
         operator = ""
         return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "^"):
-        num1 = int(num1) ** int(num2)
+        num1 = str(int(num1) ** int(num2))
         num2 = ""
         operator = ""
         return jsonify(num1=num1, operator="", num2=""), 200
