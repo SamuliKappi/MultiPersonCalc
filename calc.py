@@ -25,11 +25,15 @@ class CalculatorWindow(ctk.CTkFrame):
                 self.create_symbolbutton(SYMBOLS[buttoncount], x, y)
                 buttoncount += 1
 
-        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Refresh dingus",
-                                        height=60, width=120, command = lambda: self.post("Refresh"))
-        refresh_button.grid(row=5, column=0, columnspan=2)
+        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Refresh",
+                                        height=60, width=60, command = lambda: self.post("Refresh"))
+        refresh_button.grid(row=5, column=0, columnspan=1)
 
-        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Reset dingus",
+        backspace_button = ctk.CTkButton(master=self.__calculatorframe, text="Erase",
+                                        height=60, width=60, command = lambda: self.post("Erase"))
+        backspace_button.grid(row=5, column=1, columnspan=1)
+
+        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Reset",
                                 height=60, width=120, command = lambda: self.post("Reset"))
         refresh_button.grid(row=5, column=2, columnspan=2)
 
@@ -53,6 +57,8 @@ class CalculatorWindow(ctk.CTkFrame):
             self.__equation_label.configure(text=(str(response["num1"]) + str(response["operator"]) + str(response["num2"])))
 
     def post(self, code):
+        if code == "Erase":
+            response = self.__mw.erase()
         if code == "Reset":
             response = self.__mw.reset()
         elif code == "Refresh":
@@ -199,6 +205,9 @@ class Calc:
     
     def reset(self):
         return cm.on_reset(self.__token)
+    
+    def erase(self):
+        return cm.erase(self.__token)
 
 if __name__ == "__main__":
     cm = communicator.Communicator()
