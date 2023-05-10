@@ -4,10 +4,20 @@ The concept behind our application is a multiplayer calculator, where both you a
 ### Structure of the Program
 The program effectively consists of two larger areas: the application which the user uses, as well as the Flask server used to perform the background logic and validate the user's credentials as well as their input.
 
+**Application:** The application has a base layer class which controls the window itself, called Calc. Within it are three classes inherited from the CTkFrame class (a part of the UI library, CustomTKinter, which we used), RegistrationWindow, LoginWindow and CalculatorWindow, which hold the main components, such as displays, buttons and input fields for registering and logging into the system. They communicate with the server using the Communicator class, which uses the Requests library to send pre-determined and uneditable HTTP requests to the server.
+
+**Server:** The server is built upon the Flask library. It is accessed using HTTP requests, which it validates and processes accordingly depending on predetermined endpoints, such as /login, /reset and /status. It upholds the status of the calculator in variables unaccessable other than through the endpoint.
+
 ### Secure programming solutions
+The following solutions have been chosen to address known problems with security in programs:
+- The password must be at minimum 8 characters long.
+- Passwords are hashed and verified using the Argon2 library.
+- The user tokens are generated using JWT (JSON Web Tokens) as a way to perform user authentication. The Secrets library from python is used to generate a 256-bit key.
+- All input is either treated as string values, or is predetermined and not written user input.
+- The server validates (and accepts or rejects) all input sent by a valid user, or by directly posting to the server.
+- The requests made to the server are hard-coded.
 
 #### SANS 25
-
 **1. Out-of-bounds Write:** Out-of-bounds write errors are not applicable to Python 3.X.
 **2. Cross-site Scripting:** Application does not allow for free-form user input.
 **3. SQL Injection:** Application does not utilize SQL databases.
@@ -36,10 +46,10 @@ Unrestricted Upload of File with Dangerous Type:** Application does not support 
 **25. Code Injection:** The server accepts code segments as part of a password, but treats them as strings.
 
 ### Testing
-
 Testing was done manually, both through application testing, static code analysis and by prompting the server with various types of erroneous requests.
 
 ### Missing Implementations
+Some components of conventional calculators are missing from the application, such as square roots, and more importantly working with non-integer values.
 
 ### Known Security Issues or Vulnerabilities
 The server is currently comparatively prone to multi-directional DDoS attacks which overload the server, as requests are not denied, and a single thread may prove to not be able to support the mass of requests sent to it.
