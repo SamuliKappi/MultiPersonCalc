@@ -24,7 +24,7 @@ def sign_post():
       name = request.form.get("name")
       password = request.form.get("password")
     except:
-        return jsonify(message="Name or Password missing"), 400
+        return jsonify(message="Invalid credentials"), 400
 
     if(len(password) < 4):
         return jsonify(message="Invalid password"), 404
@@ -39,7 +39,7 @@ def sign_post():
             return jsonify(message="Name is already taken"), 400
     f.close()
 
-    hashpw = ph.hash(request.form.get("password"))
+    hashpw = ph.hash(password)
     f = open("users.db", "ab")
     f.write(name.encode() + ":".encode() + hashpw.encode() + "\n".encode())
     f.close()
@@ -52,7 +52,7 @@ def login_post():
       name = request.form.get("name")
       password = request.form.get("password")
     except:
-        return jsonify(message="Name or Password missing"), 400
+        return jsonify(message="Invalid credentials"), 400
     f = open("users.db", "rb")
     lines = f.readlines()
     for line in lines:
@@ -66,21 +66,11 @@ def login_post():
               
             except argon2.exceptions.VerifyMismatchError:
                 f.close()
-                return jsonify(message="Wrong password or username"), 401
+                return jsonify(message="Invalid credentials"), 401
             
     f.close()
-    return jsonify(message="Wrong password or username"), 401
+    return jsonify(message="Invalid credentials"), 401
 
-
-@app.post("/test")
-def test_post():
-    token = request.form.get("token")
-    try:
-        jwt.decode(token.encode(), key, algorithms=["HS256"])
-        print("Succ")
-        return jsonify(), 202
-    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
-        return jsonify(message="Token has expired or is invalid"), 401
 
 def is_operator(char):
     if(re.match("[/*+-]", str(char))):
@@ -90,12 +80,19 @@ def is_operator(char):
 
 @app.post("/addNumber")
 def add_number():
-    token = request.form.get("token")
+    try:
+      token = request.form.get("token")
+    except:
+        return jsonify(message="Token is missing"), 401
     try:
         jwt.decode(token.encode(), key, algorithms=["HS256"])
     except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
-        return jsonify(message="Token has expired or is invalid"), 401
-    userinput = request.form.get("input")
+        return jsonify(message="Token is invalid"), 401
+    try:
+        userinput = request.form.get("input")
+    except:
+        return jsonify(message="Input is invalid"), 400
+    
     if(len(userinput) != 1):
         return jsonify(message="Should not be possible"), 418
     global operator, num1, num2
@@ -106,7 +103,7 @@ def add_number():
             num1 += str(userinput)
     elif(operator == "" and is_operator(userinput)):
         operator = str(userinput)
-    elif(operator != "" and not is_operator(userinput)):
+    elif(operator != "" and not is_operator(userinput) and re.match("[0-9]", userinput)):
         if(num2 == "0"):
             num2 = userinput
         else:
@@ -117,9 +114,12 @@ def add_number():
 
 @app.post("/reset")
 def reset():
-    token = request.form.get("token")
+    try:
+      token = request.form.get("token")
+    except:
+        return jsonify(message="Token is missing"), 401
     if(not validate_token(token)):
-        return jsonify(message="Token has expired or is invalid"), 401
+        return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
     num1 = "0"
     num2 = "0"
@@ -128,45 +128,59 @@ def reset():
 
 @app.get("/status")
 def status():
-    token = request.form.get("token")
+    try:
+      token = request.form.get("token")
+    except:
+        return jsonify(message="Token is missing"), 401
     if(not validate_token(token)):
-        return jsonify(message="Token has expired or is invalid"), 401
+        return jsonify(message="Token is invalid"), 401
     return jsonify(num1=num1, operator=operator, num2=num2), 200
 @app.post("/equals")
 def equals():
-    token = request.form.get("token")
+    try:
+      token = request.form.get("token")
+    except:
+        return jsonify(message="Token is missing"), 401
     if(not validate_token(token)):
-        return jsonify(message="Token has expired or is invalid"), 401
+        return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
     if(operator == "+"):
         result = int(num1) + int(num2)
         num1 = "0"
-        num2 = "0"
-        operator = None
+        num2 = ""
+        operator = ""
         return jsonify(result=result), 200
     elif(operator == "*"):
         result = int(num1) * int(num2)
         num1 = "0"
-        num2 = "0"
-        operator = None
+        num2 = ""
+        operator = ""
         return jsonify(result=result), 200
     elif(operator == "/"):
         result = int(num1) / int(num2)
         num1 = "0"
-        num2 = "0"
-        operator = None
+        num2 = ""
+        operator = ""
         return jsonify(result=result), 200
     elif(operator == "-"):
         result = int(num1) - int(num2)
         num1 = "0"
-        num2 = "0"
-        operator = None
+        num2 = ""
+        operator = ""
         return jsonify(result=result), 200
+    elif(operator == "^"):
+        result = int(num1) ** int(num2)
+        num1 = "0"
+        num2 = ""
+        operator = ""
+        return jsonify(result=result), 200
+    else:
+        return jsonify(messsage="Invalid operator"), 400
 def validate_token(token):
     try:
         jwt.decode(token.encode(), key, algorithms=["HS256"])
     except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError):
-        print("Token has expired or is invalid")
+        print("Token is invalid")
         return False
     return True
 
