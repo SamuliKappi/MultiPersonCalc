@@ -126,6 +126,30 @@ def reset():
     operator = ""
     return jsonify(num1=num1, operator=operator, num2=num2), 200
 
+@app.post("/erase")
+def erase():
+    try:
+      token = request.form.get("token")
+    except:
+        return jsonify(message="Token is missing"), 401
+    if(not validate_token(token)):
+        return jsonify(message="Token is invalid"), 401
+    if(num2 != ""):
+        num2 = num2[:-1]
+        return jsonify(num1=num1, operator=operator, num2=num2), 200
+    elif(operator != ""):
+        operator = ""
+        return jsonify(num1=num1, operator=operator, num2=num2), 200
+    elif(num1 != "0"):
+        if(len(num1) == 1):
+            num1 = "0"
+        else:
+            num1 = num1[:-1]
+        return jsonify(num1=num1, operator=operator, num2=num2), 200
+    else:
+        return jsonify(message="I'm a teapot"), 418
+    
+
 @app.post("/status")
 def status():
     try:
