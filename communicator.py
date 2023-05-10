@@ -30,7 +30,7 @@ class Communicator:
 
     def on_reset(self, token):
         form = {"token": token}
-        response = requests.get("https://127.0.0.1:5000/reset", form, verify=False)
+        response = requests.post("https://127.0.0.1:5000/reset", form, verify=False)
         print(response.json())
         return response.json()
     
