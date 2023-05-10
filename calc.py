@@ -5,7 +5,8 @@ from functools import partial
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("dark-blue")
 
-SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*", "^", "0", "=", "/"]
+SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*"
+           , "^", "0", "=", "/", "±", "⌫", "C", "↻"]
 
 class CalculatorWindow(ctk.CTkFrame):
     def __init__(self, mainwindow, parent):
@@ -15,33 +16,23 @@ class CalculatorWindow(ctk.CTkFrame):
         self.__calculatorframe = ctk.CTkFrame(master=parent)
         self.__calculatorframe.grid(row=0, column=0)
 
-        self.__equation_label = ctk.CTkLabel(master=self.__calculatorframe, text="")
+        self.__equation_label = ctk.CTkLabel(master=self.__calculatorframe, text="",
+                                             font=ctk.CTkFont(family='Helvetica', size=18))
         self.__equation_label.grid(row=0, column=0, columnspan=4)
 
         buttoncount = 0
 
-        for x in range(4):
+        for x in range(5):
             for y in range(4):
                 self.create_symbolbutton(SYMBOLS[buttoncount], x, y)
                 buttoncount += 1
-
-        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Refresh",
-                                        height=60, width=60, command = lambda: self.post("Refresh"))
-        refresh_button.grid(row=5, column=0, columnspan=1)
-
-        backspace_button = ctk.CTkButton(master=self.__calculatorframe, text="Erase",
-                                        height=60, width=60, command = lambda: self.post("Erase"))
-        backspace_button.grid(row=5, column=1, columnspan=1)
-
-        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Reset",
-                                height=60, width=120, command = lambda: self.post("Reset"))
-        refresh_button.grid(row=5, column=2, columnspan=2)
 
         self.hide()
     
     def create_symbolbutton(self, symbol, x, y):
         symbol_button = ctk.CTkButton(master=self.__calculatorframe, text=symbol,
-                                              width=60, height=60, command = lambda: self.post(symbol))
+                                      font=ctk.CTkFont(family='Helvetica', size=18),
+                                      width=60, height=60, command = lambda: self.post(symbol))
         symbol_button.grid(row=1+x, column=y)
 
     def hide(self):
@@ -57,14 +48,16 @@ class CalculatorWindow(ctk.CTkFrame):
             self.__equation_label.configure(text=(str(response["num1"]) + str(response["operator"]) + str(response["num2"])))
 
     def post(self, code):
-        if code == "Erase":
+        if code == "⌫":
             response = self.__mw.erase()
-        elif code == "Reset":
+        elif code == "C":
             response = self.__mw.reset()
-        elif code == "Refresh":
+        elif code == "↻":
             response = self.__mw.status()
         elif code == "=":
             response = self.__mw.equals()
+        elif code == "±":
+            response = self.__mw.swap()
         else:
             response = self.__mw.send(code)
 
@@ -208,6 +201,9 @@ class Calc:
     
     def erase(self):
         return cm.erase(self.__token)
+
+    def swap(self):
+        return cm.swap(self.__token)
 
 if __name__ == "__main__":
     cm = communicator.Communicator()
