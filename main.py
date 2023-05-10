@@ -24,7 +24,7 @@ def sign_post():
     except:
         return jsonify(message="Invalid credentials"), 400
 
-    if(len(password) < 4):
+    if(len(password) < 8):
         return jsonify(message="Invalid password"), 404
     if (not re.match("^[A-Za-z0-9_-]{1,}$", name)):
         return jsonify(message="Invalid name"), 404
