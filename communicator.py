@@ -47,7 +47,7 @@ class Communicator:
     def get_status(self, token):
         form = {"token": token}
         try:
-          response = requests.get("https://127.0.0.1:5000/status", form, verify=False)
+          response = requests.post("https://127.0.0.1:5000/status", form, verify=False)
         except requests.exceptions.ConnectionError:
             return {"error": "Connection refused"}
         if(response.status_code != 200):

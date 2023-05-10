@@ -73,7 +73,7 @@ def login_post():
 
 
 def is_operator(char):
-    if(re.match("[/*+-]", str(char))):
+    if(re.match("[/*+^-]", str(char))):
         return True
     else:
         return False
@@ -122,11 +122,11 @@ def reset():
         return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
     num1 = "0"
-    num2 = "0"
-    operator = None
-    return jsonify(num1=num1, operator=operator, num2=num2, message="Succesfully reset"), 200
+    num2 = ""
+    operator = ""
+    return jsonify(num1=num1, operator=operator, num2=num2), 200
 
-@app.get("/status")
+@app.post("/status")
 def status():
     try:
       token = request.form.get("token")
@@ -145,35 +145,30 @@ def equals():
         return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
     if(operator == "+"):
-        result = int(num1) + int(num2)
-        num1 = "0"
+        num1 = int(num1) + int(num2)
         num2 = ""
         operator = ""
-        return jsonify(num1=result, operator="", num2=""), 200
+        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "*"):
-        result = int(num1) * int(num2)
-        num1 = "0"
+        num1 = int(num1) * int(num2)
         num2 = ""
         operator = ""
-        return jsonify(num1=result, operator="", num2=""), 200
+        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "/"):
-        result = int(num1) / int(num2)
-        num1 = "0"
+        num1 = int(num1) / int(num2)
         num2 = ""
         operator = ""
-        return jsonify(num1=result, operator="", num2=""), 200
+        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "-"):
-        result = int(num1) - int(num2)
-        num1 = "0"
+        num1 = int(num1) - int(num2)
         num2 = ""
         operator = ""
-        return jsonify(num1=result, operator="", num2=""), 200
+        return jsonify(num1=num1, operator="", num2=""), 200
     elif(operator == "^"):
-        result = int(num1) ** int(num2)
-        num1 = "0"
+        num1 = int(num1) ** int(num2)
         num2 = ""
         operator = ""
-        return jsonify(num1=result, operator="", num2=""), 200
+        return jsonify(num1=num1, operator="", num2=""), 200
     else:
         return jsonify(messsage="Invalid operator"), 400
 def validate_token(token):
