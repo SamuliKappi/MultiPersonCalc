@@ -14,6 +14,10 @@ num1 = "0"
 operator = ""
 num2 = ""
 
+@app.errorhandler(404) 
+def non_existant_route(error):
+   return jsonify({"message":"I'm a teapot"}), 418
+
 @app.post("/signup")
 def sign_post():
     try:
@@ -22,7 +26,7 @@ def sign_post():
     except:
         return jsonify(message="Name or Password missing"), 400
 
-    if(len(password) < 1):
+    if(len(password) < 4):
         return jsonify(message="Invalid password"), 404
     if (not re.match("^[A-Za-z0-9_-]{1,}$", name)):
         return jsonify(message="Invalid name"), 404
@@ -39,7 +43,7 @@ def sign_post():
     f = open("users.db", "ab")
     f.write(name.encode() + ":".encode() + hashpw.encode() + "\n".encode())
     f.close()
-    return jsonify(message="Account created"), 201
+    return jsonify(), 201
 
 
 @app.post("/login")
@@ -58,7 +62,7 @@ def login_post():
               if(ph.verify(credentails[1].strip(), password)):
                   f.close()
                   jwttoken = jwt.encode({"exp": datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=10)}, key, algorithm="HS256")
-                  return jsonify(message="Logged in", token=jwttoken, num1=num1, operator=operator, num2=num2), 202
+                  return jsonify(token=jwttoken, num1=num1, operator=operator, num2=num2), 202
               
             except argon2.exceptions.VerifyMismatchError:
                 f.close()
