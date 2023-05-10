@@ -205,7 +205,10 @@ def equals():
         num2 = ""
         operator = ""
     elif(operator == "/"):
-        num1 = str(int(num1) // int(num2))
+        if(num2 == "0" or num2 == "-0"):
+            num1 = "0"
+        else:
+          num1 = str(int(num1) // int(num2))
         num2 = ""
         operator = ""
     elif(operator == "-"):
