@@ -134,21 +134,44 @@ def erase():
         return jsonify(message="Token is missing"), 401
     if(not validate_token(token)):
         return jsonify(message="Token is invalid"), 401
+    global num1, num2, operator
     if(num2 != ""):
-        num2 = num2[:-1]
+        if(num2[0] == "-" and len(num2) == 2):
+            num2 = ""
+        else:
+          num2 = num2[:-1]
         return jsonify(num1=num1, operator=operator, num2=num2), 200
     elif(operator != ""):
         operator = ""
         return jsonify(num1=num1, operator=operator, num2=num2), 200
-    elif(num1 != "0"):
-        if(len(num1) == 1):
+    else:
+        
+        if(len(num1) == 1 or (len(num1) == 2 and num1[0] == "-")):
             num1 = "0"
         else:
             num1 = num1[:-1]
         return jsonify(num1=num1, operator=operator, num2=num2), 200
-    else:
-        return jsonify(message="I'm a teapot"), 418
     
+@app.post("/swap")
+def swap():
+    try:
+      token = request.form.get("token")
+    except:
+        return jsonify(message="Token is missing"), 401
+    if(not validate_token(token)):
+        return jsonify(message="Token is invalid"), 401
+    if(num2 != ""):
+        if(num2[0] == "-"):
+          num2 = num2[1:]
+        else:
+          num2 = "-" + num2
+        return jsonify(num1=num1, operator=operator, num2=num2), 200
+    else:
+        if(num1[0] == "-"):
+          num1 = num1[1:]
+        else:
+          num1 = "-" + num1
+        return jsonify(num1=num1, operator=operator, num2=num2), 200
 
 @app.post("/status")
 def status():

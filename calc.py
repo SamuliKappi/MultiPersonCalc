@@ -59,7 +59,7 @@ class CalculatorWindow(ctk.CTkFrame):
     def post(self, code):
         if code == "Erase":
             response = self.__mw.erase()
-        if code == "Reset":
+        elif code == "Reset":
             response = self.__mw.reset()
         elif code == "Refresh":
             response = self.__mw.status()

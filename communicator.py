@@ -63,7 +63,17 @@ class Communicator:
         if(response.status_code != 200):
             return {"error": response.json()["message"]}
         return response.json()
-    
+
+    def swap(self, token):
+        form = {"token": token}
+        try:
+          response = requests.post("https://127.0.0.1:5000/swap", form, verify=False)
+        except requests.exceptions.ConnectionError:
+            return {"error": "Connection refused"}
+        if(response.status_code != 200):
+            return {"error": response.json()["message"]}
+        return response.json()
+
     def erase(self, token):
         form = {"token": token}
         try:
