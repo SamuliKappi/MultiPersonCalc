@@ -6,7 +6,7 @@ from functools import partial
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("dark-blue")
 
-SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*", "R", "0", "=", "/"]
+SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*", "^", "0", "=", "/"]
 
 class CalculatorWindow(ctk.CTkFrame):
     def __init__(self, mainwindow, parent):
@@ -20,17 +20,26 @@ class CalculatorWindow(ctk.CTkFrame):
         self.__equation_label.grid(row=0, column=0, columnspan=4)
 
         buttoncount = 0
+
         for x in range(4):
             for y in range(4):
                 self.create_symbolbutton(SYMBOLS[buttoncount], x, y)
                 buttoncount += 1
+
+        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Refresh dingus",
+                                        height=60, width=120, command = lambda: self.post("Refresh"))
+        refresh_button.grid(row=6, column=0, columnspan=2)
+
+        refresh_button = ctk.CTkButton(master=self.__calculatorframe, text="Reset dingus",
+                                height=60, width=120, command = lambda: self.post("Reset"))
+        refresh_button.grid(row=6, column=2, columnspan=2)
 
         self.hide()
     
     def create_symbolbutton(self, symbol, x, y):
         symbol_button = ctk.CTkButton(master=self.__calculatorframe, text=symbol,
                                               width=60, height=60, command = lambda: self.post(symbol))
-        symbol_button.grid(row=1+x, column=y)
+        symbol_button.grid(row=2+x, column=y)
 
     def hide(self):
         self.__calculatorframe.grid_forget()
@@ -39,19 +48,22 @@ class CalculatorWindow(ctk.CTkFrame):
         self.__calculatorframe.grid(row=0, column=0)
 
     def update_screen(self, response):
-        self.__equation_label.config(text = str(response["num1"]) + str(response["operator"]) + str(response["num2"]))
-
-    def post(self, symbol):
-        if symbol == "R":
-            response = self.__mw.status()
+        if "error" in response:
+            self.__equation_label.configure(text=str(response["error"]))
         else:
-            response = self.__mw.send(symbol)
-            
-        try:   
-            if response["status"] == 200:
-                self.update_screen(response)
-        except:
-            print("faulty lol")
+            self.__equation_label.configure(text=(str(response["num1"]) + str(response["operator"]) + str(response["num2"])))
+
+    def post(self, code):
+        if code == "Reset":
+            response = self.__mw.reset()
+        if code == "Refresh":
+            response = self.__mw.status()
+        elif code == "=":
+            response = self.__mw.equals()
+        else:
+            response = self.__mw.send(code)
+
+        self.update_screen(response)
 
 
 class LoginWindow(ctk.CTkFrame):
@@ -64,6 +76,9 @@ class LoginWindow(ctk.CTkFrame):
 
         login_label = ctk.CTkLabel(master=self.__loginframe, text="Login")
         login_label.pack(padx=10, pady=8)
+
+        self.__error_label = ctk.CTkLabel(master=self.__loginframe, text="")
+        self.__error_label.pack(padx=0, pady=0)
 
         self.__username_entry = ctk.CTkEntry(master=self.__loginframe, placeholder_text="Username")
         self.__username_entry.pack(padx=10, pady=8)
@@ -85,8 +100,10 @@ class LoginWindow(ctk.CTkFrame):
     def log(self):
         self.__mw.log([self.__username_entry.get(), self.__password_entry.get()])
 
+    def display_error(self, string):
+        self.__error_label.configure(text=string)
+
     def move_to_reg(self):
-        self.__loginframe.grid_forget()
         self.__mw.move_to_reg()
 
 
@@ -97,8 +114,11 @@ class RegistrationWindow(ctk.CTkFrame):
         self.__registrationframe = ctk.CTkFrame(master=parent)
         self.__registrationframe.grid(row=0, column=0)
 
-        login_label = ctk.CTkLabel(master=self.__registrationframe, text="Register")
-        login_label.pack(padx=10, pady=8)
+        register_label = ctk.CTkLabel(master=self.__registrationframe, text="Register")
+        register_label.pack(padx=10, pady=8)
+
+        self.__error_label = ctk.CTkLabel(master=self.__registrationframe, text="")
+        self.__error_label.pack(padx=0, pady=0)
 
         self.__username_entry = ctk.CTkEntry(master=self.__registrationframe, placeholder_text="Choose a username")
         self.__username_entry.pack(padx=10, pady=8)
@@ -149,17 +169,21 @@ class Calc:
         self.__frames["registration"].show()
         self.__current_frame = self.__frames["registration"]
 
-    def move_to_calc(self):
+    def move_to_calc(self, login_data):
         self.__current_frame.hide()
         self.__frames["calculator"].show()
         self.__current_frame = self.__frames["calculator"]
+        self.__current_frame.update_screen(login_data)
+
 
     def log(self, credentials):
         print(credentials)
         login_data = cm.on_login(credentials)
-        if login_data["status"] ==  202:
+        if "error" in login_data:
+            self.__current_frame.display_error(login_data["error"])
+        else:
             self.__token = login_data["token"]
-            self.move_to_calc()
+            self.move_to_calc(login_data)
 
     def reg(self, credentials):
         if cm.on_register(credentials):
@@ -170,6 +194,12 @@ class Calc:
 
     def status(self):
         return cm.get_status(self.__token)
+    
+    def equals(self):
+        return cm.equals(self.__token)
+    
+    def reset(self):
+        return cm.on_reset(self.__token)
 
 if __name__ == "__main__":
     cm = communicator.Communicator()
