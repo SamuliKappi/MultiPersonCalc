@@ -6,7 +6,7 @@ from functools import partial
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("dark-blue")
 
-SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*", "/", "0", ",", "="]
+SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*", "R", "0", "=", "/"]
 
 class CalculatorWindow(ctk.CTkFrame):
     def __init__(self, mainwindow, parent):
@@ -29,7 +29,7 @@ class CalculatorWindow(ctk.CTkFrame):
     
     def create_symbolbutton(self, symbol, x, y):
         symbol_button = ctk.CTkButton(master=self.__calculatorframe, text=symbol,
-                                              width=50, height=50, command = lambda: self.post(symbol))
+                                              width=60, height=60, command = lambda: self.post(symbol))
         symbol_button.grid(row=1+x, column=y)
 
     def hide(self):
@@ -38,9 +38,20 @@ class CalculatorWindow(ctk.CTkFrame):
     def show(self):
         self.__calculatorframe.grid(row=0, column=0)
 
+    def update_screen(self, response):
+        self.__equation_label.config(text = str(response["num1"]) + str(response["operator"]) + str(response["num2"]))
+
     def post(self, symbol):
-        print(symbol)
-        self.__mw.send(symbol)
+        if symbol == "R":
+            response = self.__mw.status()
+        else:
+            response = self.__mw.send(symbol)
+            
+        try:   
+            if response["status"] == 200:
+                self.update_screen(response)
+        except:
+            print("faulty lol")
 
 
 class LoginWindow(ctk.CTkFrame):
@@ -155,9 +166,10 @@ class Calc:
             self.move_to_log()
     
     def send(self, symbol):
-        cm.on_post(symbol, self.__token)
-        #cm.get_status(self.__token)
+        return cm.on_post(symbol, self.__token)
 
+    def status(self):
+        return cm.get_status(self.__token)
 
 if __name__ == "__main__":
     cm = communicator.Communicator()
