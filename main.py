@@ -12,31 +12,35 @@ num1 = "0"
 operator = ""
 num2 = ""
 
+#Default return for all wrong endpoints
 @app.errorhandler(404) 
 def non_existant_route(error):
    return jsonify({"message":"I'm a teapot"}), 418
 
 @app.post("/signup")
 def sign_post():
+    #Verifying that request contains correct input
     try:
       name = request.form.get("name")
       password = request.form.get("password")
     except:
         return jsonify(message="Invalid credentials"), 400
-
+    #Checking that password length is 8 or more characters long
     if(len(password) < 8):
         return jsonify(message="Invalid password"), 404
+    #Matching username with regex to validate characters
     if (not re.match("^[A-Za-z0-9_-]{1,}$", name)):
         return jsonify(message="Invalid name"), 404
-    
+    #Since this is in the backend we can assume users.db exists
     f = open("users.db", "rb")
     lines = f.readlines()
+    #Checking if the name already exists
     for line in lines:
         namesInDb = line.split(':'.encode(), 1)
         if(namesInDb[0] == name.encode()):
             return jsonify(message="Name is already taken"), 400
     f.close()
-
+    #Hashing password with argon2id using default parameters ~50ms hash time
     hashpw = ph.hash(password)
     f = open("users.db", "ab")
     f.write(name.encode() + ":".encode() + hashpw.encode() + "\n".encode())
@@ -46,6 +50,7 @@ def sign_post():
 
 @app.post("/login")
 def login_post():
+    #Verifying that request contains correct input
     try:
       name = request.form.get("name")
       password = request.form.get("password")
@@ -57,8 +62,10 @@ def login_post():
         credentails = line.split(':'.encode(), 1)
         if(credentails[0] == name.encode()):
             try:
+              #verifying that password matches the hash in the db
               if(ph.verify(credentails[1].strip(), password)):
                   f.close()
+                  #Creating jwt token for the session
                   jwttoken = jwt.encode({"exp": datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=10)}, key, algorithm="HS256")
                   return jsonify(token=jwttoken, num1=num1, operator=operator, num2=num2), 202
               
@@ -78,6 +85,7 @@ def is_operator(char):
 
 @app.post("/addNumber")
 def add_number():
+    #Verifying that request contains correct input
     try:
       token = request.form.get("token")
     except:
@@ -90,10 +98,11 @@ def add_number():
         userinput = request.form.get("input")
     except:
         return jsonify(message="Input is invalid"), 400
-    
+    #Validating that userinput is exactly 1 char long
     if(len(userinput) != 1):
         return jsonify(message="I'm a teapot"), 418
     global operator, num1, num2
+    #Logic and further input validation for adding of a number or an operator
     if(operator == "" and re.match("[0-9]", userinput)):
         if(num1 == "0"):
             num1 = userinput
@@ -116,6 +125,7 @@ def add_number():
 
 @app.post("/reset")
 def reset():
+    #Verifying that request contains correct input
     try:
       token = request.form.get("token")
     except:
@@ -130,6 +140,7 @@ def reset():
 
 @app.post("/erase")
 def erase():
+    #Verifying that request contains correct input
     try:
       token = request.form.get("token")
     except:
@@ -156,6 +167,7 @@ def erase():
     
 @app.post("/swap")
 def swap():
+    #Verifying that request contains correct input
     try:
       token = request.form.get("token")
     except:
@@ -178,6 +190,7 @@ def swap():
 
 @app.post("/status")
 def status():
+    #Verifying that request contains correct input
     try:
       token = request.form.get("token")
     except:
@@ -187,6 +200,7 @@ def status():
     return jsonify(num1=num1, operator=operator, num2=num2), 200
 @app.post("/equals")
 def equals():
+    #Verifying that request contains correct input
     try:
       token = request.form.get("token")
     except:
@@ -194,6 +208,7 @@ def equals():
     if(not validate_token(token)):
         return jsonify(message="Token is invalid"), 401
     global num1, num2, operator
+    #Logic for math
     if(num2 == "" and is_operator(operator)):
         num2 = num1
     if(operator == "+"):
@@ -237,5 +252,7 @@ def validate_token(token):
     return True
 
 if __name__ == "__main__":
+    #Generating 32byte secret key that is later used for JWT generation
     key = secrets.token_bytes(32)
+    #Running server over HTTPS generating certificate and keys on the fly
     app.run(ssl_context='adhoc')
