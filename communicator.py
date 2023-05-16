@@ -1,6 +1,10 @@
 import requests
 
 class Communicator:
+    """
+    Class Communicator uses requests library
+    to send out HTTP requests to predetermined server
+    """
     def __init__(self):
         pass
 
