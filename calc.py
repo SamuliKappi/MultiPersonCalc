@@ -5,10 +5,15 @@ from functools import partial
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("dark-blue")
 
+# Symbols for the calculator buttons
 SYMBOLS = ["1", "2", "3", "+", "4", "5", "6", "-", "7", "8", "9", "*"
            , "^", "0", "=", "/", "±", "⌫", "C", "↻"]
 
 class CalculatorWindow(ctk.CTkFrame):
+    """
+    One of the views for the Calc class, has most of the
+    main functionality of the calculator behind the Communicator class
+    """
     def __init__(self, mainwindow, parent):
         super().__init__(parent)
         self.__mw = mainwindow
@@ -65,6 +70,9 @@ class CalculatorWindow(ctk.CTkFrame):
 
 
 class LoginWindow(ctk.CTkFrame):
+    """
+    One of the views for the Calc class
+    """
     def __init__(self, mainwindow, parent):
         super().__init__(parent)
         self.__mw = mainwindow
@@ -106,6 +114,9 @@ class LoginWindow(ctk.CTkFrame):
 
 
 class RegistrationWindow(ctk.CTkFrame):
+    """
+    One of the views for the Calc class
+    """
     def __init__(self, mainwindow, parent):
         super().__init__(parent)
         self.__mw = mainwindow
@@ -145,6 +156,10 @@ class RegistrationWindow(ctk.CTkFrame):
 
 
 class Calc:
+    """
+    Main window for the application, uses a TKinter based mainloop
+    to run the application
+    """
     def __init__(self, cm):
         self.__window = ctk.CTk()
         self.__window.resizable(False,False)

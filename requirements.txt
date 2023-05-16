@@ -1,0 +1,6 @@
+argon2-cffi
+requests
+datetime
+pyjwt
+flask
+customtkinter
