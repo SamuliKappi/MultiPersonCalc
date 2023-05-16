@@ -4,3 +4,4 @@ datetime
 pyjwt
 flask
 customtkinter
+pyopenssl

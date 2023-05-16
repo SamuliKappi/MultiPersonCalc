@@ -1,3 +1,8 @@
+### Installation
+pip install -r requirements.txt
+python main.py
+python calc.py
+
 ### General Description
 The concept behind our application is a multiplayer calculator, where both you and other people, anonymous to you, may attempt to perform or sabotage the act of completing basic mathematical calculations.
 
